@@ -18,7 +18,7 @@ class License:
 
             # Check Params
             if 'email' not in params and 'key' not in params:
-                return jsonify({"response": "Authentication failed. Invalid params"}), 401
+                return jsonify({"response": "The license is not valid"}), 401
 
             # Get License
             try:
@@ -28,11 +28,11 @@ class License:
 
             # Check authentication
             if len(l) == 0 or params['key'].encode('utf-8') != l[0]['key'].encode('utf-8'):
-                return jsonify({"response": "Authentication failed. Invalid credentials"}), 401
+                return jsonify({"response": "The license is not valid"}), 401
             elif l[0]['expiration'] <= datetime.now():
-                return jsonify({"response": "Authentication failed. License expired"}), 401
+                return jsonify({"response": "The license has expired"}), 401
             else:
-                return jsonify({"response": "Authentication succeeded"}), 200
+                return jsonify({"response": "The license is valid"}), 200
 
         return license_blueprint
  

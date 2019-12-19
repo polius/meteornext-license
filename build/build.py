@@ -1,3 +1,4 @@
+# # curl -d '{"email":"test@test.com","key":"test"}' -H 'Content-Type: application/json' http://localhost:5000/license
 import os
 import sys
 import time

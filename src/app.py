@@ -2,7 +2,6 @@ import sys
 import json
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from flask_jwt_extended import JWTManager
 import routes.license
 import models.mysql
 
@@ -22,7 +21,6 @@ except Exception as e:
 # Instantiate Flask App
 app = Flask(__name__)
 app.config.from_object(__name__)
-jwt = JWTManager(app)
 
 # Instantiate & Register Settings Blueprint
 l = routes.license.License(sql)

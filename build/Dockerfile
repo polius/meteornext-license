@@ -18,7 +18,6 @@ RUN apk update && \
     pip3 install gunicorn && \
     pip3 install flask && \
     pip3 install flask_cors && \
-    pip3 install flask_jwt_extended && \
     pip3 install pymysql && \
     chown root:nginx /root && \
     chmod 750 /root && \
