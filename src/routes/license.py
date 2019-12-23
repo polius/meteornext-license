@@ -31,7 +31,10 @@ class License:
                 return jsonify({"response": "The license is not valid"}), 401
             elif l[0]['expiration'] <= datetime.now():
                 return jsonify({"response": "The license has expired"}), 401
+            elif l[0]['in_use'] and l[0]['uuid'] != params['uuid']:
+                return jsonify({"The license is already in use"}), 401
             else:
+                self._licenses.post(params['email'], params['uuid'])
                 return jsonify({"response": "The license is valid"}), 200
 
         return license_blueprint
