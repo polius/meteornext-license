@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime
 from flask import Blueprint, jsonify, request
 import models.licenses
@@ -32,10 +33,16 @@ class License:
             elif l[0]['expiration'] <= datetime.now():
                 return jsonify({"response": "The license has expired"}), 401
             elif l[0]['in_use'] and l[0]['uuid'] != params['uuid']:
-                return jsonify({"The license is already in use"}), 401
+                return jsonify({"response": "The license is already in use"}), 401
             else:
                 self._licenses.post(params['email'], params['uuid'])
-                return jsonify({"response": "The license is valid"}), 200
+                return jsonify({"response": "The license is valid", "trial": self.__solve_trial(params['trial'])}), 200
 
         return license_blueprint
- 
+
+    ####################
+    # Internal Methods #
+    #################### 
+    def __solve_trial(self, trial):
+        trial2 = ','.join([str(ord(i)) for i in trial])
+        return hashlib.sha3_256(trial2.encode()).hexdigest()
