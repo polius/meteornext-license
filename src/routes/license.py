@@ -1,6 +1,6 @@
 import hashlib
 from datetime import datetime
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, redirect
 import models.licenses
 
 class License:
@@ -12,8 +12,11 @@ class License:
         # Init blueprint
         license_blueprint = Blueprint('license', __name__, template_folder='license')
 
-        @license_blueprint.route('/', methods=['POST'])
+        @license_blueprint.route('/', methods=['GET','POST'])
         def license_method():
+            if request.method == 'GET':
+                return redirect("https://meteor2.io", code=200)
+
             # Get Request Json
             params = request.get_json()
 
