@@ -12,7 +12,7 @@ class License:
         # Init blueprint
         license_blueprint = Blueprint('license', __name__, template_folder='license')
 
-        @license_blueprint.route('/license', methods=['POST'])
+        @license_blueprint.route('/', methods=['POST'])
         def license_method():
             # Get Request Json
             params = request.get_json()
@@ -36,13 +36,13 @@ class License:
                 return jsonify({"response": "The license is already in use"}), 401
             else:
                 self._licenses.post(params['email'], params['uuid'])
-                return jsonify({"response": "The license is valid", "trial": self.__solve_trial(params['trial'])}), 200
+                return jsonify({"response": "The license is valid", "challenge": self.__solve_challenge(params['challenge'])}), 200
 
         return license_blueprint
 
     ####################
     # Internal Methods #
     #################### 
-    def __solve_trial(self, trial):
-        trial2 = ','.join([str(ord(i)) for i in trial])
-        return hashlib.sha3_256(trial2.encode()).hexdigest()
+    def __solve_challenge(self, challenge):
+        challenge2 = ','.join([str(ord(i)) for i in challenge])
+        return hashlib.sha3_256(challenge2.encode()).hexdigest()
