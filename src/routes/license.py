@@ -1,3 +1,4 @@
+import uuid
 import hashlib
 from datetime import datetime
 from flask import Blueprint, jsonify, request, redirect
@@ -21,7 +22,13 @@ class License:
             params = request.get_json()
 
             # Check Params
-            if 'email' not in params and 'key' not in params:
+            if 'email' not in params or 'key' not in params or 'challenge' not in params:
+                return jsonify({"response": "The license is not valid"}), 401
+
+            # Check Challenge Format
+            try:
+                uuid.UUID(params['challenge'], version=4)
+            except ValueError:
                 return jsonify({"response": "The license is not valid"}), 401
 
             # Get License
