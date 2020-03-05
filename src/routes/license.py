@@ -33,20 +33,20 @@ class License:
 
             # Get License
             try:
-                l = self._licenses.get(params['email'])
+                license = self._licenses.get(params['email'])[0]
             except Exception as e:
                 return jsonify({"response": "Authentication failed. An error occurred during the authentication process", "date": str(datetime.utcnow())}), 401
 
             # Check authentication
-            if len(l) == 0 or params['key'].encode('utf-8') != l[0]['key'].encode('utf-8'):
+            if params['key'].encode('utf-8') != license['key'].encode('utf-8'):
                 return jsonify({"response": "The license is not valid", "date": str(datetime.utcnow())}), 401
-            elif l[0]['expiration'] <= datetime.now():
+            elif license['expiration'] <= datetime.now():
                 return jsonify({"response": "The license has expired", "date": str(datetime.utcnow())}), 401
-            elif l[0]['in_use'] and l[0]['uuid'] != params['uuid']:
+            elif license['in_use'] and license['uuid'] != params['uuid']:
                 return jsonify({"response": "The license is already in use", "date": str(datetime.utcnow())}), 401
             else:
                 self._licenses.post(params['email'], params['uuid'])
-                return jsonify({"response": "The license is valid", "challenge": self.__solve_challenge(params['challenge']), "date": str(datetime.utcnow())}), 200
+                return jsonify({"response": "The license is valid", "challenge": self.__solve_challenge(params['challenge']), "date": str(datetime.utcnow()), "expiration": license['expiration']}), 200
 
         return license_blueprint
 
