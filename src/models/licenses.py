@@ -4,18 +4,19 @@ class Licenses:
 
     def get(self, email):
         query = """
-            SELECT `email`, `key`, `expiration`, `in_use`, `uuid`, `last_used`
-            FROM `licenses`
-            WHERE `email` = %s
+            SELECT a.email, l.key, l.expiration, l.resources, l.in_use, l.uuid, l.last_used
+            FROM licenses l
+            JOIN accounts a ON a.id = l.account_id AND a.email = %s
         """
         return self._sql.execute(query, (email))
 
     def post(self, email, uuid):
         query = """
-            UPDATE `licenses`
-            SET `in_use` = 1,
-                `uuid` = %s,
-                `last_used` = CURRENT_TIMESTAMP
-            WHERE `email` = %s 
+            UPDATE licenses
+            JOIN accounts ON accounts.id = licenses.account_id
+            SET licenses.in_use = 1,
+                licenses.uuid = %s,
+                licenses.last_used = CURRENT_TIMESTAMP
+            WHERE accounts.email = %s
         """
         return self._sql.execute(query, (uuid, email))

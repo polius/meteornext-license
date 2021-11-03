@@ -14,6 +14,7 @@ COPY build/start.sh /root/licenser/
 RUN apk update && \
     apk upgrade && \
     apk add python3 && \
+    apk add py3-pip && \
     pip3 install --upgrade pip && \
     pip3 install gunicorn && \
     pip3 install flask && \

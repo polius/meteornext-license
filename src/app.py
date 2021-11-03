@@ -1,6 +1,6 @@
 import sys
 import json
-from flask import Flask, jsonify, request
+from flask import Flask
 from flask_cors import CORS
 import routes.license
 import models.mysql
@@ -12,7 +12,7 @@ with open('licenser.conf') as json_file:
 # Instantiate SQL Class & Connect
 sql = models.mysql.mysql()
 try:
-    sql.connect(data['hostname'], data['username'], data['password'], data['port'], data['database'])
+    sql.connect(data['hostname'], data['username'], data['password'], int(data['port']), data['database'])
 except Exception as e:
     print("- Invalid SQL Credentials")
     print('- Error: {}'.format(e))

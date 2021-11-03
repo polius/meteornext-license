@@ -19,34 +19,37 @@ class License:
                 return redirect("https://meteor2.io", code=200)
 
             # Get Request Json
-            params = request.get_json()
-
-            # Check Params
-            if 'email' not in params or 'key' not in params or 'challenge' not in params:
-                return jsonify({"response": "The license is not valid", "date": str(datetime.utcnow())}), 401
+            try:
+                params = request.get_json()
+                if params is None or 'email' not in params or 'key' not in params or 'challenge' not in params:
+                    raise Exception()
+            except Exception:
+                return jsonify({"response": "Invalid request", "date": str(datetime.utcnow())}), 400
 
             # Check Challenge Format
             try:
                 uuid.UUID(params['challenge'], version=4)
             except ValueError:
-                return jsonify({"response": "The license is not valid", "date": str(datetime.utcnow())}), 401
+                return jsonify({"response": "Invalid request", "date": str(datetime.utcnow())}), 401
 
             # Get License
-            try:
-                license = self._licenses.get(params['email'])[0]
-            except Exception as e:
-                return jsonify({"response": "Authentication failed. An error occurred during the authentication process", "date": str(datetime.utcnow())}), 401
+            license = self._licenses.get(params['email'])
+
+            # Check if license exists
+            if len(license) == 0:
+                return jsonify({"response": "Invalid credentials", "date": str(datetime.utcnow())}), 401
+            license = license [0]
 
             # Check authentication
             if params['key'].encode('utf-8') != license['key'].encode('utf-8'):
                 return jsonify({"response": "The license is not valid", "date": str(datetime.utcnow())}), 401
-            elif license['expiration'] <= datetime.now():
+            elif license['expiration'] is not None and license['expiration'] <= datetime.now():
                 return jsonify({"response": "The license has expired", "date": str(datetime.utcnow())}), 401
             elif license['in_use'] and license['uuid'] != params['uuid']:
                 return jsonify({"response": "The license is already in use", "date": str(datetime.utcnow())}), 401
             else:
                 self._licenses.post(params['email'], params['uuid'])
-                return jsonify({"response": "The license is valid", "challenge": self.__solve_challenge(params['challenge']), "date": str(datetime.utcnow()), "expiration": license['expiration']}), 200
+                return jsonify({"response": "The license is valid", "challenge": self.__solve_challenge(params['challenge']), "date": str(datetime.utcnow()), "resources": license['resources'], "expiration": license['expiration']}), 200
 
         return license_blueprint
 
