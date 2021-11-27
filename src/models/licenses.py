@@ -1,22 +1,24 @@
+from datetime import datetime
+
 class Licenses:
     def __init__(self, sql):
         self._sql = sql
 
-    def get(self, email):
+    def get(self, access_key):
         query = """
-            SELECT a.email, l.key, l.expiration, l.resources, l.in_use, l.uuid, l.last_used
+            SELECT l.access_key, l.secret_key, p.resources, l.in_use, l.uuid, l.last_used
             FROM licenses l
-            JOIN accounts a ON a.id = l.account_id AND a.email = %s
+            JOIN products p ON p.id = l.product_id
+            WHERE l.access_key = %s
         """
-        return self._sql.execute(query, (email))
+        return self._sql.execute(query, (access_key))
 
-    def post(self, email, uuid):
+    def post(self, access_key, uuid):
         query = """
-            UPDATE licenses
-            JOIN accounts ON accounts.id = licenses.account_id
-            SET licenses.in_use = 1,
-                licenses.uuid = %s,
-                licenses.last_used = CURRENT_TIMESTAMP
-            WHERE accounts.email = %s
+            UPDATE `licenses`
+            SET `in_use` = 1,
+                `uuid` = %s,
+                `last_used` = %s
+            WHERE `access_key` = %s
         """
-        return self._sql.execute(query, (uuid, email))
+        return self._sql.execute(query, (uuid, datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S"), access_key))

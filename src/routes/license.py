@@ -21,7 +21,7 @@ class License:
             # Get Request Json
             try:
                 params = request.get_json()
-                if params is None or 'email' not in params or 'key' not in params or 'challenge' not in params:
+                if params is None or 'access_key' not in params or 'secret_key' not in params or 'challenge' not in params:
                     raise Exception()
             except Exception:
                 return jsonify({"response": "Invalid request", "date": str(datetime.utcnow())}), 400
@@ -33,7 +33,7 @@ class License:
                 return jsonify({"response": "Invalid request", "date": str(datetime.utcnow())}), 401
 
             # Get License
-            license = self._licenses.get(params['email'])
+            license = self._licenses.get(params['access_key'])
 
             # Check if license exists
             if len(license) == 0:
@@ -41,15 +41,13 @@ class License:
             license = license [0]
 
             # Check authentication
-            if params['key'].encode('utf-8') != license['key'].encode('utf-8'):
+            if params['secret_key'].encode('utf-8') != license['secret_key'].encode('utf-8'):
                 return jsonify({"response": "The license is not valid", "date": str(datetime.utcnow())}), 401
-            elif license['expiration'] is not None and license['expiration'] <= datetime.now():
-                return jsonify({"response": "The license has expired", "date": str(datetime.utcnow())}), 401
             elif license['in_use'] and license['uuid'] != params['uuid']:
                 return jsonify({"response": "The license is already in use", "date": str(datetime.utcnow())}), 401
             else:
-                self._licenses.post(params['email'], params['uuid'])
-                return jsonify({"response": "The license is valid", "challenge": self.__solve_challenge(params['challenge']), "date": str(datetime.utcnow()), "resources": license['resources'], "expiration": license['expiration']}), 200
+                self._licenses.post(params['access_key'], params['uuid'])
+                return jsonify({"response": "The license is valid", "challenge": self.__solve_challenge(params['challenge']), "date": str(datetime.utcnow()), "resources": license['resources']}), 200
 
         return license_blueprint
 
