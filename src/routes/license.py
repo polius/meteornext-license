@@ -47,7 +47,7 @@ class License:
                 return jsonify({"response": "The license is already in use", "date": str(datetime.utcnow())}), 401
             else:
                 self._licenses.post(params['access_key'], params['uuid'])
-                return jsonify({"response": "The license is valid", "challenge": self.__solve_challenge(params['challenge']), "date": str(datetime.utcnow()), "resources": license['resources']}), 200
+                return jsonify({"response": "The license is valid", "challenge": self.__solve_challenge(params['challenge']), "date": str(datetime.utcnow()), "resources": license['resources'], "sentry": license['sentry']}), 200
 
         return license_blueprint
 
