@@ -13,10 +13,7 @@ class License:
 
     def blueprint(self):
         # Get Request Json
-        try:
-            if 'access_key' not in self._event or 'secret_key' not in self._event or 'challenge' not in self._event:
-                raise Exception()
-        except Exception:
+        if 'access_key' not in self._event or 'secret_key' not in self._event or 'challenge' not in self._event:
             return {
                 'statusCode': 400,
                 'body': {"response": "Invalid request", "date": str(datetime.utcnow())}
@@ -43,7 +40,7 @@ class License:
         license = license [0]
 
         # Check authentication
-        if self._event.get('secret_key').encode('utf-8') != self._event.get('secret_key').encode('utf-8'):
+        if license['secret_key'] != self._event.get('secret_key'):
             return {
                 'statusCode': 401,
                 'body': {"response": "The license is not valid", "date": str(datetime.utcnow())}
