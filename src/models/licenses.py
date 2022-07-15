@@ -6,7 +6,7 @@ class Licenses:
 
     def get(self, access_key):
         query = """
-            SELECT l.access_key, l.secret_key, p.resources, l.in_use, l.uuid, l.last_used, IF(s.sentry_enabled, s.sentry_dsn, NULL) AS 'sentry'
+            SELECT l.access_key, l.secret_key, p.resources, l.in_use, l.uuid, l.last_used, s.sentry_enabled AS 'sentry'
             FROM licenses l
             JOIN products p ON p.id = l.product_id
             LEFT JOIN accounts_sentry s ON s.account_id = l.account_id
